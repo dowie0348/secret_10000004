@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3학년 마니또 비밀 수호대 대시보드</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Gothic A1 / Jua) -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f4f7fe;
+        }
+        .font-jua {
+            font-family: 'Jua', sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Header Navigation -->
+    <header class="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/20 p-2.5 rounded-2xl backdrop-blur-md flex items-center justify-center w-11 h-11">
+                    <i class="fa-solid fa-user-secret text-2xl text-yellow-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-jua tracking-wide drop-shadow-sm">🕵️‍♂️ 3학년 마니또 비밀 수호대</h1>
+                    <p class="text-xs text-white/90 font-medium">4원칙 준수! 마니또 관찰일지 & 편지 기록장</p>
+                </div>
+            </div>
+            
+            <!-- Quick Link to Padlet & Global Actions -->
+            <div class="flex items-center gap-2 flex-wrap justify-center">
+                <button onclick="openPadletModal()" class="bg-yellow-400 hover:bg-yellow-300 text-gray-800 font-bold px-4 py-2 rounded-xl text-sm transition-all duration-200 shadow-md flex items-center gap-2 border-2 border-yellow-200">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <span>패들렛 연결 설정</span>
+                </button>
+                <a id="headerPadletBtn" href="https://padlet.com" target="_blank" class="bg-white text-indigo-600 hover:bg-indigo-50 font-bold px-4 py-2 rounded-xl text-sm transition-all duration-200 shadow-md flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span>패들렛 바로가기</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
+
+        <!-- Banner & Controls Header -->
+        <div class="bg-white rounded-3xl p-6 card-shadow border border-indigo-50">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <!-- Info Section -->
+                <div>
+                    <span class="bg-indigo-100 text-indigo-700 font-bold text-xs px-3 py-1.5 rounded-full inline-block mb-2">
+                        💡 마니또 4원칙 준수
+                    </span>
+                    <h2 class="text-2xl font-jua text-gray-800">우리의 마니또 미션 현황판</h2>
+                    <p class="text-sm text-gray-500 mt-1">관찰일지 작성 완료 후 활동지 2장(앞면 관찰일지 + 뒷면 편지) 사진을 업로드해 주세요!</p>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Search Bar -->
+                    <div class="relative flex-1 min-w-[200px]">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400"></i>
+                        <input type="text" id="searchInput" onkeyup="filterStudents()" placeholder="학생 이름 검색..." 
+                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-sm transition">
+                    </div>
+
+                    <!-- Teacher Mode Toggle Switch -->
+                    <button id="teacherToggleBtn" onclick="toggleTeacherPasswordModal()" 
+                            class="bg-gray-800 text-white hover:bg-gray-900 font-medium px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-lock" id="lockIcon"></i>
+                        <span id="teacherToggleText">선생님 확인모드 (비밀 해제)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats Summary -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
+                <div class="bg-indigo-50/50 p-4 rounded-2xl text-center border border-indigo-100">
+                    <p class="text-xs text-indigo-500 font-bold">전체 학생</p>
+                    <p class="text-2xl font-jua text-indigo-700 mt-1" id="totalCount">19명</p>
+                </div>
+                <div class="bg-emerald-50/50 p-4 rounded-2xl text-center border border-emerald-100">
+                    <p class="text-xs text-emerald-500 font-bold">제출 완료</p>
+                    <p class="text-2xl font-jua text-emerald-700 mt-1" id="completedCount">0명</p>
+                </div>
+                <div class="bg-amber-50/50 p-4 rounded-2xl text-center border border-amber-100">
+                    <p class="text-xs text-amber-500 font-bold">진행 중</p>
+                    <p class="text-2xl font-jua text-amber-700 mt-1" id="pendingCount">19명</p>
+                </div>
+                <div class="bg-purple-50/50 p-4 rounded-2xl text-center border border-purple-100">
+                    <p class="text-xs text-purple-500 font-bold">총 업로드 사진</p>
+                    <p class="text-2xl font-jua text-purple-700 mt-1" id="totalPhotosCount">0장</p>
+                </div>
+            </div>
+
+            <!-- Manito Rules / Precautions Box -->
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-pink-50 rounded-2xl p-4 sm:p-5 border border-amber-200/70 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="bg-amber-500 text-white rounded-lg p-1.5 text-xs flex items-center justify-center">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </span>
+                        <h3 class="text-base font-jua text-amber-900">🚨 3학년 마니또 수호대 필수 주의사항 (6가지)</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs text-gray-700">
+                        <div class="bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-amber-100 flex items-start gap-2">
+                            <span class="font-bold text-amber-600 font-mono text-sm">1.</span>
+                            <span class="font-medium"><strong>여러 명에게 하기</strong> (특정 한 명만 챙기지 않기)</span>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-amber-100 flex items-start gap-2">
+                            <span class="font-bold text-amber-600 font-mono text-sm">2.</span>
+                            <span class="font-medium"><strong>비밀 지키기!</strong> (가장 친한 친구에게도 절대 말하지 않기)</span>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-amber-100 flex items-start gap-2">
+                            <span class="font-bold text-amber-600 font-mono text-sm">3.</span>
+                            <span class="font-medium"><strong>누가 누구 마니또인지 추리해서 말하기 금지</strong></span>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-amber-100 flex items-start gap-2">
+                            <span class="font-bold text-amber-600 font-mono text-sm">4.</span>
+                            <span class="font-medium"><strong>금전적인 선물 절대 안 됨!</strong></span>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-amber-100 flex items-start gap-2">
+                            <span class="font-bold text-amber-600 font-mono text-sm">5.</span>
+                            <span class="font-medium"><strong>필통 열어 두기!</strong> (몰래 편지 넣기 아주 좋음 ✏️)</span>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-amber-100 flex items-start gap-2">
+                            <span class="font-bold text-amber-600 font-mono text-sm">6.</span>
+                            <span class="font-medium"><strong>마음에 안 드는 친구라고 인상 쓰고 대충 하지 않기</strong> (차라리 4원칙이라도 철저히 감시!)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Manito Cards Grid -->
+        <div id="studentsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic JS Injected Student Cards -->
+        </div>
+
+    </main>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 card-shadow space-y-5 transform transition-all">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-xl font-jua text-gray-800 flex items-center gap-2">
+                    <span class="bg-indigo-100 text-indigo-600 p-2 rounded-xl text-sm">📸</span>
+                    <span id="modalStudentName">학생</span>의 마니또 활동지 기록
+                </h3>
+                <button onclick="closeUploadModal()" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Upload Guidelines -->
+            <div class="bg-blue-50 border border-blue-100 p-3.5 rounded-2xl text-xs text-blue-800 space-y-1">
+                <p class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i>활동지 사진 2장을 등록해 주세요!</p>
+                <p>1. 앞면 : 마니또 관찰일지 내용이 잘 보이게 촬영</p>
+                <p>2. 뒷면 : 친구에게 쓴 마니또 편지 내용 촬영</p>
+            </div>
+
+            <!-- Photos Input Form -->
+            <div class="space-y-4">
+                <!-- Photo 1: Observation Log -->
+                <div class="border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center hover:border-indigo-400 transition bg-gray-50/50">
+                    <p class="text-xs font-bold text-gray-600 mb-2">📄 1. 앞면 (관찰일지) 사진</p>
+                    <div id="previewContainer1" class="hidden mb-3">
+                        <img id="imgPreview1" src="" class="max-h-40 mx-auto rounded-xl shadow-sm object-cover">
+                    </div>
+                    <label class="cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 font-medium px-4 py-2 rounded-xl text-xs inline-flex items-center gap-2 shadow-sm text-gray-700">
+                        <i class="fa-solid fa-camera text-indigo-500"></i>
+                        <span>사진 촬영 또는 선택</span>
+                        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleImageUpload(event, 1)">
+                    </label>
+                </div>
+
+                <!-- Photo 2: Letter -->
+                <div class="border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center hover:border-indigo-400 transition bg-gray-50/50">
+                    <p class="text-xs font-bold text-gray-600 mb-2">💌 2. 뒷면 (마음 편지) 사진</p>
+                    <div id="previewContainer2" class="hidden mb-3">
+                        <img id="imgPreview2" src="" class="max-h-40 mx-auto rounded-xl shadow-sm object-cover">
+                    </div>
+                    <label class="cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 font-medium px-4 py-2 rounded-xl text-xs inline-flex items-center gap-2 shadow-sm text-gray-700">
+                        <i class="fa-solid fa-camera text-indigo-500"></i>
+                        <span>사진 촬영 또는 선택</span>
+                        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleImageUpload(event, 2)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="pt-2 border-t flex flex-col gap-2">
+                <button onclick="saveStudentPhotos()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition">
+                    활동지 제출/저장하기
+                </button>
+                <a id="modalPadletLink" href="https://padlet.com" target="_blank" class="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-800 font-bold py-2.5 rounded-xl text-xs shadow-sm transition text-center flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-up-right-from-square"></i>
+                    <span>패들렛으로 직접 업로드하러 가기</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Padlet Link Config Modal -->
+    <div id="padletModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 card-shadow space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-jua text-gray-800">📌 학급 패들렛 URL 설정</h3>
+                <button onclick="closePadletModal()" class="text-gray-400 hover:text-gray-600 p-2">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <p class="text-xs text-gray-600">아이들이 바로 이동하여 게시물을 업로드할 패들렛 보드 주소를 입력해 주세요.</p>
+            <input type="url" id="padletUrlInput" placeholder="https://padlet.com/your-board" class="w-full border p-3 rounded-xl text-sm focus:ring-2 focus:ring-yellow-400 focus:outline-none">
+            <button onclick="savePadletUrl()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-3 rounded-xl text-sm transition">
+                주소 저장하기
+            </button>
+        </div>
+    </div>
+
+    <!-- Teacher Password Verification Modal -->
+    <div id="passwordModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 card-shadow space-y-4 text-center">
+            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-key"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-jua text-gray-800">선생님 확인 모드</h3>
+                <p class="text-xs text-gray-500 mt-1">선생님 비밀번호를 입력해 주세요.</p>
+            </div>
+            <div>
+                <input type="password" id="passwordInput" placeholder="비밀번호 입력" 
+                       class="w-full border border-gray-300 p-3 rounded-xl text-center text-lg tracking-widest focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                       onkeydown="if(event.key==='Enter') verifyPassword()">
+                <p id="passwordError" class="text-xs text-red-500 mt-1 hidden font-medium">비밀번호가 일치하지 않습니다.</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closePasswordModal()" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2.5 rounded-xl text-xs transition">
+                    취소
+                </button>
+                <button onclick="verifyPassword()" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">
+                    확인
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Detail Viewer Modal -->
+    <div id="imageViewerModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4" onclick="closeImageViewer()">
+        <div class="relative max-w-3xl w-full max-h-[90vh] flex flex-col items-center justify-center" onclick="event.stopPropagation()">
+            <img id="viewerImage" src="" class="max-h-[80vh] w-auto rounded-2xl shadow-2xl object-contain border-4 border-white/20">
+            <p id="viewerCaption" class="text-white text-sm font-jua mt-3 bg-black/40 px-4 py-1.5 rounded-full backdrop-blur-sm"></p>
+            <button onclick="closeImageViewer()" class="absolute top-2 right-2 text-white bg-black/50 hover:bg-black/70 p-3 rounded-full">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Manito Assignment Data (19 Students)
+        const manitoData = [
+            { id: 1, student: "지원", target: "민욱" },
+            { id: 2, student: "세희", target: "선우" },
+            { id: 3, student: "지완", target: "성빈" },
+            { id: 4, student: "하준", target: "하솔" },
+            { id: 5, student: "하늘", target: "지완" },
+            { id: 6, student: "민욱", target: "서후" },
+            { id: 7, student: "주이", target: "하준" },
+            { id: 8, student: "다솜", target: "주이" },
+            { id: 9, student: "세율", target: "해린" },
+            { id: 10, student: "성빈", target: "세율" },
+            { id: 11, student: "가람", target: "다솜" },
+            { id: 12, student: "시현", target: "세희" },
+            { id: 13, student: "해린", target: "지원" },
+            { id: 14, student: "선우", target: "지윤" },
+            { id: 15, student: "지윤", target: "목운" },
+            { id: 16, student: "시후", target: "가람" },
+            { id: 17, student: "이령", target: "시현" },
+            { id: 18, student: "하솔", target: "이령" },
+            { id: 19, student: "목운", target: "하늘" }
+        ];
+
+        // App State
+        let isTeacherMode = false;
+        let padletUrl = "https://padlet.com";
+        let activeStudentId = null;
+        let currentPhoto1 = null;
+        let currentPhoto2 = null;
+
+        // Local Storage for Uploaded Records
+        let studentRecords = JSON.parse(localStorage.getItem('manito_records')) || {};
+
+        // Color Palettes for Student Avatar Icons
+        const avatarColors = [
+            'bg-pink-100 text-pink-500 border-pink-200',
+            'bg-purple-100 text-purple-500 border-purple-200',
+            'bg-indigo-100 text-indigo-500 border-indigo-200',
+            'bg-blue-100 text-blue-500 border-blue-200',
+            'bg-teal-100 text-teal-500 border-teal-200',
+            'bg-amber-100 text-amber-500 border-amber-200'
+        ];
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudentsGrid();
+            updateStats();
+            
+            // Load saved Padlet Link if available
+            const savedPadlet = localStorage.getItem('manito_padlet_url');
+            if(savedPadlet) {
+                padletUrl = savedPadlet;
+                document.getElementById('headerPadletBtn').href = padletUrl;
+                document.getElementById('modalPadletLink').href = padletUrl;
+            }
+        });
+
+        // Render Cards Grid
+        function renderStudentsGrid(filterQuery = '') {
+            const grid = document.getElementById('studentsGrid');
+            grid.innerHTML = '';
+
+            const filteredData = manitoData.filter(item => 
+                item.student.includes(filterQuery) || 
+                (isTeacherMode && item.target.includes(filterQuery))
+            );
+
+            filteredData.forEach((item, index) => {
+                const record = studentRecords[item.id] || { photo1: null, photo2: null };
+                const isCompleted = record.photo1 && record.photo2;
+                const hasPartial = record.photo1 || record.photo2;
+                const colorClass = avatarColors[index % avatarColors.length];
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-3xl p-5 card-shadow border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between";
+                
+                card.innerHTML = `
+                    <div>
+                        <!-- Header Status -->
+                        <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-2xl ${colorClass} border flex items-center justify-center font-jua text-xl shadow-sm">
+                                    ${item.student.slice(0, 1)}
+                                </div>
+                                <div>
+                                    <h3 class="font-jua text-xl text-gray-800">${item.student}</h3>
+                                    <p class="text-xs text-gray-400 font-medium">마니또 수호대</p>
+                                </div>
+                            </div>
+                            <!-- Completion Badge -->
+                            <div>
+                                ${isCompleted 
+                                    ? `<span class="bg-emerald-100 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 border border-emerald-200">
+                                        <i class="fa-solid fa-circle-check"></i> 완료
+                                       </span>`
+                                    : (hasPartial 
+                                        ? `<span class="bg-amber-100 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 border border-amber-200">
+                                            <i class="fa-solid fa-spinner"></i> 1장 작성
+                                           </span>`
+                                        : `<span class="bg-gray-100 text-gray-500 font-bold text-xs px-2.5 py-1 rounded-full">
+                                            미제출
+                                           </span>`)
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Target Manito Info -->
+                        <div class="bg-gradient-to-r from-gray-50 to-indigo-50/30 p-3.5 rounded-2xl border border-gray-100 mb-4 text-center">
+                            <p class="text-xs text-gray-500 font-bold mb-1">🎯 내가 관찰할 마니또</p>
+                            <div class="text-lg font-jua">
+                                ${isTeacherMode 
+                                    ? `<span class="text-indigo-600 bg-indigo-50 px-3 py-0.5 rounded-lg border border-indigo-100 inline-block">${item.target}</span>`
+                                    : `<span class="text-gray-400 tracking-wider">❓ ❓ ❓</span>`
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Uploaded Photo Previews -->
+                        <div class="space-y-2 mb-4">
+                            <p class="text-xs font-bold text-gray-500 flex justify-between items-center">
+                                <span>📸 제출한 활동지</span>
+                                <span class="text-[10px] text-gray-400">(클릭 시 확대)</span>
+                            </p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <!-- Photo 1 Preview -->
+                                <div class="relative bg-gray-100 rounded-xl h-24 overflow-hidden border flex items-center justify-center group">
+                                    ${record.photo1 
+                                        ? `<img src="${record.photo1}" onclick="openImageViewer('${record.photo1}', '${item.student} - 관찰일지')" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition">`
+                                        : `<div class="text-center p-2 text-gray-400">
+                                            <i class="fa-solid fa-file-lines text-lg mb-1 block"></i>
+                                            <span class="text-[10px]">1. 관찰일지</span>
+                                           </div>`
+                                    }
+                                </div>
+                                <!-- Photo 2 Preview -->
+                                <div class="relative bg-gray-100 rounded-xl h-24 overflow-hidden border flex items-center justify-center group">
+                                    ${record.photo2 
+                                        ? `<img src="${record.photo2}" onclick="openImageViewer('${record.photo2}', '${item.student} - 편지')" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition">`
+                                        : `<div class="text-center p-2 text-gray-400">
+                                            <i class="fa-solid fa-envelope-open-text text-lg mb-1 block"></i>
+                                            <span class="text-[10px]">2. 편지</span>
+                                           </div>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload Trigger Button -->
+                    <button onclick="openUploadModal(${item.id})" 
+                            class="w-full mt-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-2.5 rounded-xl text-xs transition-all duration-200 shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus text-sm"></i>
+                        <span>활동지 사진 올려주기 (${isCompleted ? '수정' : '등록'})</span>
+                    </button>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter Logic
+        function filterStudents() {
+            const query = document.getElementById('searchInput').value.trim();
+            renderStudentsGrid(query);
+        }
+
+        // Password Verification for Teacher Mode
+        function toggleTeacherPasswordModal() {
+            if (isTeacherMode) {
+                // If currently unlocked, switch back to hidden mode directly without prompt
+                isTeacherMode = false;
+                const btn = document.getElementById('teacherToggleBtn');
+                const lockIcon = document.getElementById('lockIcon');
+                const toggleText = document.getElementById('teacherToggleText');
+
+                btn.className = "bg-gray-800 text-white hover:bg-gray-900 font-medium px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-sm";
+                lockIcon.className = "fa-solid fa-lock";
+                toggleText.innerText = "선생님 확인모드 (비밀 해제)";
+
+                renderStudentsGrid(document.getElementById('searchInput').value.trim());
+            } else {
+                // Open password verification modal
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordError').classList.add('hidden');
+                document.getElementById('passwordModal').classList.remove('hidden');
+                setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
+
+        function verifyPassword() {
+            const pwdInput = document.getElementById('passwordInput').value;
+            const errorMsg = document.getElementById('passwordError');
+            
+            // Teacher Passcode: 1004
+            if (pwdInput === '1004') {
+                isTeacherMode = true;
+                closePasswordModal();
+                
+                const btn = document.getElementById('teacherToggleBtn');
+                const lockIcon = document.getElementById('lockIcon');
+                const toggleText = document.getElementById('teacherToggleText');
+
+                btn.className = "bg-amber-500 text-white hover:bg-amber-600 font-medium px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-md";
+                lockIcon.className = "fa-solid fa-lock-open";
+                toggleText.innerText = "비밀보기 ON (다시 눌러 잠금)";
+
+                renderStudentsGrid(document.getElementById('searchInput').value.trim());
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        // Stats Counter Update
+        function updateStats() {
+            let completed = 0;
+            let totalPhotos = 0;
+
+            Object.values(studentRecords).forEach(rec => {
+                if (rec.photo1) totalPhotos++;
+                if (rec.photo2) totalPhotos++;
+                if (rec.photo1 && rec.photo2) completed++;
+            });
+
+            document.getElementById('totalCount').innerText = `${manitoData.length}명`;
+            document.getElementById('completedCount').innerText = `${completed}명`;
+            document.getElementById('pendingCount').innerText = `${manitoData.length - completed}명`;
+            document.getElementById('totalPhotosCount').innerText = `${totalPhotos}장`;
+        }
+
+        // Upload Modal Handlers
+        function openUploadModal(studentId) {
+            activeStudentId = studentId;
+            const student = manitoData.find(s => s.id === studentId);
+            const record = studentRecords[studentId] || { photo1: null, photo2: null };
+
+            document.getElementById('modalStudentName').innerText = student.student;
+            
+            // Set previews if exist
+            currentPhoto1 = record.photo1;
+            currentPhoto2 = record.photo2;
+
+            updateModalPreview(1, currentPhoto1);
+            updateModalPreview(2, currentPhoto2);
+
+            document.getElementById('uploadModal').classList.remove('hidden');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            activeStudentId = null;
+            currentPhoto1 = null;
+            currentPhoto2 = null;
+        }
+
+        // File Reader Callback
+        function handleImageUpload(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const result = e.target.result;
+                if (index === 1) {
+                    currentPhoto1 = result;
+                    updateModalPreview(1, currentPhoto1);
+                } else {
+                    currentPhoto2 = result;
+                    updateModalPreview(2, currentPhoto2);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateModalPreview(index, src) {
+            const container = document.getElementById(`previewContainer${index}`);
+            const img = document.getElementById(`imgPreview${index}`);
+            
+            if (src) {
+                img.src = src;
+                container.classList.remove('hidden');
+            } else {
+                img.src = '';
+                container.classList.add('hidden');
+            }
+        }
+
+        // Save Photos to Storage
+        function saveStudentPhotos() {
+            if (!activeStudentId) return;
+
+            if (!studentRecords[activeStudentId]) {
+                studentRecords[activeStudentId] = {};
+            }
+
+            studentRecords[activeStudentId].photo1 = currentPhoto1;
+            studentRecords[activeStudentId].photo2 = currentPhoto2;
+
+            localStorage.setItem('manito_records', JSON.stringify(studentRecords));
+
+            updateStats();
+            renderStudentsGrid(document.getElementById('searchInput').value.trim());
+            closeUploadModal();
+        }
+
+        // Padlet Modal Logic
+        function openPadletModal() {
+            document.getElementById('padletUrlInput').value = padletUrl;
+            document.getElementById('padletModal').classList.remove('hidden');
+        }
+
+        function closePadletModal() {
+            document.getElementById('padletModal').classList.add('hidden');
+        }
+
+        function savePadletUrl() {
+            const input = document.getElementById('padletUrlInput').value.trim();
+            if (input) {
+                padletUrl = input;
+                localStorage.setItem('manito_padlet_url', padletUrl);
+                document.getElementById('headerPadletBtn').href = padletUrl;
+                document.getElementById('modalPadletLink').href = padletUrl;
+                closePadletModal();
+            }
+        }
+
+        // Image Fullscreen Viewer Logic
+        function openImageViewer(src, caption) {
+            document.getElementById('viewerImage').src = src;
+            document.getElementById('viewerCaption').innerText = caption;
+            document.getElementById('imageViewerModal').classList.remove('hidden');
+        }
+
+        function closeImageViewer() {
+            document.getElementById('imageViewerModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
