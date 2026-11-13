@@ -301,7 +301,27 @@
         let currentPhoto2 = null;
 
         // Local Storage for Uploaded Records
-        let studentRecords = JSON.parse(localStorage.getItem('manito_records')) || {};
+        // Default Uploaded Records (Committed)
+        const defaultRecords = {
+            1: { photo1: "images/1_photo1.jpg", photo2: "images/1_photo2.jpg" },
+            5: { photo1: "images/5_photo1.jpg", photo2: "images/5_photo2.jpg" },
+            6: { photo1: "images/6_photo1.jpg", photo2: "images/6_photo2.jpg" },
+            7: { photo1: "images/7_photo1.jpg", photo2: "images/7_photo2.jpg" },
+            8: { photo1: "images/8_photo1.jpg", photo2: "images/8_photo2.jpg" },
+            10: { photo1: "images/10_photo1.jpg", photo2: "images/10_photo2.jpg" },
+            11: { photo1: "images/11_photo1.jpg", photo2: "images/11_photo2.jpg" },
+            15: { photo1: "images/15_photo1.jpg", photo2: "images/15_photo2.jpg" },
+            17: { photo1: "images/17_photo1.jpg", photo2: "images/17_photo2.jpg" },
+            18: { photo1: "images/18_photo1.jpg", photo2: "images/18_photo2.jpg" }
+        };
+
+        // Local Storage for Uploaded Records merged with defaults
+        let savedRecords = JSON.parse(localStorage.getItem('manito_records')) || {};
+        let studentRecords = {};
+        const allStudentIds = new Set([...Object.keys(defaultRecords), ...Object.keys(savedRecords)]);
+        allStudentIds.forEach(id => {
+            studentRecords[id] = Object.assign({}, defaultRecords[id] || {}, savedRecords[id] || {});
+        });
 
         // Color Palettes for Student Avatar Icons
         const avatarColors = [
